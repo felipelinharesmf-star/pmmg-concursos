@@ -140,6 +140,23 @@ const FilterScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
 
     const [matchingCount, setMatchingCount] = useState<number | null>(null);
 
+    // Subscription Check
+    const [isPremium, setIsPremium] = useState(false);
+    const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+    React.useEffect(() => {
+        const checkPremium = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase.from('user_profiles').select('subscription_plan').eq('id', user.id).single();
+                if (profile && ['monthly', 'quarterly', 'semiannual'].includes(profile.subscription_plan)) {
+                    setIsPremium(true);
+                }
+            }
+        };
+        checkPremium();
+    }, []);
+
     // Fetch Count Effect
     React.useEffect(() => {
         const fetchMatchingCount = async () => {
@@ -374,18 +391,60 @@ const FilterScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
                         />
                         <div className="relative w-11 h-6 bg-gray-300 dark:bg-[#3b4354] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
                     </label>
-                    <label className="flex items-center justify-between py-3 cursor-pointer group">
-                        <span className="text-base font-medium text-gray-900 dark:text-white">Somente questões que errei</span>
+                    <label className="flex items-center justify-between py-3 cursor-pointer group" onClick={(e) => {
+                        if (!isPremium) {
+                            e.preventDefault();
+                            setShowPremiumModal(true);
+                        }
+                    }}>
+                        <div className="flex items-center gap-2">
+                            <span className="text-base font-medium text-gray-900 dark:text-white">Somente questões que errei</span>
+                            {!isPremium && <span className="material-symbols-outlined text-sm text-yellow-600" title="Premium">lock</span>}
+                        </div>
                         <input
                             type="checkbox"
                             className="sr-only peer"
                             checked={onlyWrong}
-                            onChange={(e) => setOnlyWrong(e.target.checked)}
+                            onChange={(e) => {
+                                if (isPremium) setOnlyWrong(e.target.checked);
+                            }}
+                            disabled={!isPremium}
                         />
-                        <div className="relative w-11 h-6 bg-gray-300 dark:bg-[#3b4354] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                        <div className={`relative w-11 h-6 bg-gray-300 dark:bg-[#3b4354] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${isPremium ? 'peer-checked:bg-primary' : 'opacity-60 cursor-not-allowed'}`}></div>
                     </label>
                 </div>
             </main>
+
+            {/* Premium Upsell Modal */}
+            {showPremiumModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-surface-dark rounded-2xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl scale-100 animate-in zoom-in-95">
+                        <div className="w-16 h-16 bg-gradient-to-tr from-yellow-400 to-orange-500 rounded-full mx-auto flex items-center justify-center shadow-lg">
+                            <span className="material-symbols-outlined text-white text-[32px]">workspace_premium</span>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Filtro Exclusivo Premium</h2>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
+                                Estude com eficiência focando apenas onde você tem dificuldade. Assine o Premium para desbloquear!
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-2 pt-2">
+                            <button
+                                onClick={() => onNavigate(Screen.SUBSCRIPTION)}
+                                className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-95"
+                            >
+                                Assinar Agora
+                            </button>
+                            <button
+                                onClick={() => setShowPremiumModal(false)}
+                                className="w-full py-3 text-gray-500 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                            >
+                                Talvez depois
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Footer Action - Sticky Bottom */}
             <div className="sticky bottom-0 z-30 p-4 pb-24 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-[#222831]">

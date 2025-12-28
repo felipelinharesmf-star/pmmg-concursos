@@ -143,6 +143,38 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
         }
     };
 
+    // Check if user is premium
+    const isPremium = userProfile?.subscription_plan && ['monthly', 'quarterly', 'semiannual'].includes(userProfile.subscription_plan);
+
+    const PremiumLock = () => (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 dark:bg-black/80 backdrop-blur-sm rounded-2xl overflow-hidden">
+            {/* Gradient Background Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-purple-600/10 pointer-events-none" />
+
+            <div className="relative z-10 flex flex-col items-center p-6 text-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg mb-3 animate-[bounce_3s_infinite]">
+                    <span className="material-symbols-outlined text-white text-2xl">lock</span>
+                </div>
+
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                    Conteúdo Premium
+                </h3>
+
+                <p className="text-sm text-gray-600 dark:text-gray-300 max-w-[200px] mb-4 leading-relaxed">
+                    Desbloqueie rankings, gráficos e análises detalhadas.
+                </p>
+
+                <button
+                    onClick={() => onNavigate(Screen.SUBSCRIPTION)}
+                    className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm rounded-lg shadow-lg hover:scale-105 transition-transform active:scale-95 flex items-center gap-2"
+                >
+                    <span>Seja Premium</span>
+                    <span className="material-symbols-outlined text-lg">crown</span>
+                </button>
+            </div>
+        </div>
+    );
+
     const processChartData = (data: any[]) => {
         let filtered = selectedSubjectChart === 'all'
             ? data
@@ -244,160 +276,177 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
             <main className="flex-1 overflow-y-auto p-5 pb-24 space-y-6">
 
                 {/* 1. Privacy Section */}
-                <section style={{ width: '100%', backgroundColor: 'var(--primary-50)', borderRadius: '16px', padding: '20px', border: '1px solid var(--primary-100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary-900)' }}>Ranking Público</h3>
-                        <p style={{ fontSize: '0.75rem', marginTop: '4px', color: userProfile?.is_public ? 'var(--success-dark)' : 'var(--primary-700)' }}>
-                            {userProfile?.is_public ? 'Você está participando visivelmente.' : 'Ative para ver e ser visto no ranking.'}
-                        </p>
-                    </div>
-                    <div
-                        onClick={togglePrivacy}
-                        style={{
-                            width: '48px', height: '24px',
-                            backgroundColor: userProfile?.is_public ? 'var(--primary-600)' : 'var(--surface-200)',
-                            borderRadius: '99px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.2s'
-                        }}
-                    >
-                        <div style={{
-                            width: '18px', height: '18px',
-                            backgroundColor: 'white', borderRadius: '50%',
-                            position: 'absolute', top: '3px',
-                            left: userProfile?.is_public ? '27px' : '3px',
-                            transition: 'left 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
-                        }} />
+                <section className="relative" style={{ width: '100%', backgroundColor: 'var(--primary-50)', borderRadius: '16px', padding: '20px', border: '1px solid var(--primary-100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {!isPremium && <PremiumLock />}
+                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm w-full flex justify-between items-center' : 'w-full flex justify-between items-center'}>
+                        <div>
+                            <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary-900)' }}>Ranking Público</h3>
+                            <p style={{ fontSize: '0.75rem', marginTop: '4px', color: userProfile?.is_public ? 'var(--success-dark)' : 'var(--primary-700)' }}>
+                                {userProfile?.is_public ? 'Você está participando visivelmente.' : 'Ative para ver e ser visto no ranking.'}
+                            </p>
+                        </div>
+                        <div
+                            onClick={togglePrivacy}
+                            style={{
+                                width: '48px', height: '24px',
+                                backgroundColor: userProfile?.is_public ? 'var(--primary-600)' : 'var(--surface-200)',
+                                borderRadius: '99px', position: 'relative', cursor: 'pointer', transition: 'background-color 0.2s'
+                            }}
+                        >
+                            <div style={{
+                                width: '18px', height: '18px',
+                                backgroundColor: 'white', borderRadius: '50%',
+                                position: 'absolute', top: '3px',
+                                left: userProfile?.is_public ? '27px' : '3px',
+                                transition: 'left 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)'
+                            }} />
+                        </div>
                     </div>
                 </section>
 
                 {/* 2. Ranking Card */}
-                <section style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
-                    <div className="flex-row items-center gap-2 mb-4">
-                        <span className="material-symbols-outlined" style={{ color: '#eab308' }}>emoji_events</span>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-900)' }}>Ranking Geral</h2>
-                    </div>
-                    <div className="flex-col gap-3">
-                        {ranking.length === 0 && !loading && (
-                            <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-500)' }}>Nenhum dado disponível.</p>
-                        )}
-                        {ranking.map((item) => (
-                            <div
-                                key={item.position}
-                                style={{
-                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '12px',
-                                    backgroundColor: item.isMe ? 'var(--primary-50)' : 'var(--surface-50)',
-                                    border: item.isMe ? '1px solid var(--primary-200)' : 'none'
-                                }}
-                            >
-                                <div className="flex-row items-center gap-3">
-                                    <div style={{
-                                        width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 700,
-                                        backgroundColor: item.position <= 3 ? '#fef9c3' : 'var(--surface-200)',
-                                        color: item.position <= 3 ? '#a16207' : 'var(--text-500)'
-                                    }}>
-                                        {item.position}º
+                <section className="relative" style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
+                    {!isPremium && <PremiumLock />}
+                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                        <div className="flex-row items-center gap-2 mb-4">
+                            <span className="material-symbols-outlined" style={{ color: '#eab308' }}>emoji_events</span>
+                            <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-900)' }}>Ranking Geral</h2>
+                        </div>
+                        <div className="flex-col gap-3">
+                            {ranking.length === 0 && !loading && (
+                                <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'var(--text-500)' }}>Nenhum dado disponível.</p>
+                            )}
+                            {ranking.map((item) => (
+                                <div
+                                    key={item.position}
+                                    style={{
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', borderRadius: '12px',
+                                        backgroundColor: item.isMe ? 'var(--primary-50)' : 'var(--surface-50)',
+                                        border: item.isMe ? '1px solid var(--primary-200)' : 'none'
+                                    }}
+                                >
+                                    <div className="flex-row items-center gap-3">
+                                        <div style={{
+                                            width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 700,
+                                            backgroundColor: item.position <= 3 ? '#fef9c3' : 'var(--surface-200)',
+                                            color: item.position <= 3 ? '#a16207' : 'var(--text-500)'
+                                        }}>
+                                            {item.position}º
+                                        </div>
+                                        <span style={{ fontSize: '0.875rem', fontWeight: item.isMe ? 700 : 400, color: item.isMe ? 'var(--primary-700)' : 'var(--text-700)' }}>
+                                            {item.name}
+                                        </span>
                                     </div>
-                                    <span style={{ fontSize: '0.875rem', fontWeight: item.isMe ? 700 : 400, color: item.isMe ? 'var(--primary-700)' : 'var(--text-700)' }}>
-                                        {item.name}
-                                    </span>
+                                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-900)' }}>{item.score}%</span>
                                 </div>
-                                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-900)' }}>{item.score}%</span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </section>
 
                 {/* 3. Stats by Subject */}
-                <section className="flex-col gap-4">
+                <section className="relative flex-col gap-4">
+                    {!isPremium && <PremiumLock />}
                     <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-900)' }}>Desempenho por Matéria</h2>
-                    {loading && stats.length === 0 ? (
-                        <div style={{ textAlign: 'center', color: 'var(--text-500)', padding: '20px' }}>Carregando...</div>
-                    ) : stats.length === 0 ? (
-                        <div style={{ backgroundColor: 'var(--surface-0)', padding: '24px', borderRadius: '16px', border: '1px solid var(--surface-200)', textAlign: 'center' }}>
-                            <p style={{ color: 'var(--text-500)' }}>Sem dados suficientes.</p>
-                        </div>
-                    ) : (
-                        stats.map((stat) => {
-                            const pct = Math.round((stat.correct / stat.total) * 100);
-                            const barColor = getPerformanceColor(pct);
-                            return (
-                                <div key={stat.subject} style={{ backgroundColor: 'var(--surface-0)', padding: '16px', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-700)' }}>{stat.subject}</span>
-                                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: barColor }}>{pct}%</span>
+                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                        {loading && stats.length === 0 ? (
+                            <div style={{ textAlign: 'center', color: 'var(--text-500)', padding: '20px' }}>Carregando...</div>
+                        ) : stats.length === 0 ? (
+                            <div style={{ backgroundColor: 'var(--surface-0)', padding: '24px', borderRadius: '16px', border: '1px solid var(--surface-200)', textAlign: 'center' }}>
+                                <p style={{ color: 'var(--text-500)' }}>Sem dados suficientes.</p>
+                            </div>
+                        ) : (
+                            stats.map((stat) => {
+                                const pct = Math.round((stat.correct / stat.total) * 100);
+                                const barColor = getPerformanceColor(pct);
+                                return (
+                                    <div key={stat.subject} style={{ backgroundColor: 'var(--surface-0)', padding: '16px', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-700)' }}>{stat.subject}</span>
+                                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: barColor }}>{pct}%</span>
+                                        </div>
+                                        <div style={{ width: '100%', height: '10px', backgroundColor: 'var(--surface-100)', borderRadius: '99px', overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${pct}%`, backgroundColor: barColor, borderRadius: '99px', transition: 'width 0.5s' }} />
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.75rem', color: 'var(--text-500)' }}>
+                                            <span>{stat.correct} acertos</span>
+                                            <span>{stat.total} questões</span>
+                                        </div>
                                     </div>
-                                    <div style={{ width: '100%', height: '10px', backgroundColor: 'var(--surface-100)', borderRadius: '99px', overflow: 'hidden' }}>
-                                        <div style={{ height: '100%', width: `${pct}%`, backgroundColor: barColor, borderRadius: '99px', transition: 'width 0.5s' }} />
-                                    </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '0.75rem', color: 'var(--text-500)' }}>
-                                        <span>{stat.correct} acertos</span>
-                                        <span>{stat.total} questões</span>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
+                                );
+                            })
+                        )}
+                    </div>
                 </section>
 
                 {/* 4. Evolution Chart */}
-                <section style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
-                    <div style={{ marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                            <div className="flex-row items-center gap-2">
-                                <span className="material-symbols-outlined" style={{ color: 'var(--primary-500)' }}>show_chart</span>
-                                <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-900)' }}>Evolução</h2>
-                            </div>
-                            {/* Period Filter */}
-                            <div style={{ display: 'flex', backgroundColor: 'var(--surface-100)', borderRadius: '8px', padding: '4px' }}>
-                                {['weekly', 'monthly', 'all'].map((t) => (
-                                    <button
-                                        key={t}
-                                        onClick={() => { setTimeRange(t as any); }}
-                                        style={{
-                                            padding: '4px 12px', fontSize: '0.75rem', fontWeight: 700, borderRadius: '6px',
-                                            backgroundColor: timeRange === t ? 'var(--surface-0)' : 'transparent',
-                                            color: timeRange === t ? 'var(--primary-600)' : 'var(--text-500)',
-                                            boxShadow: timeRange === t ? 'var(--shadow-sm)' : 'none'
-                                        }}
-                                    >
-                                        {t === 'weekly' ? 'Sem' : t === 'monthly' ? 'Mês' : 'Geral'}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        {/* Subject Select */}
-                        <select
-                            value={selectedSubjectChart}
-                            onChange={(e) => { setSelectedSubjectChart(e.target.value); }}
-                            style={{
-                                width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--surface-200)',
-                                backgroundColor: 'var(--surface-50)', color: 'var(--text-700)', fontSize: '0.875rem', outline: 'none'
-                            }}
-                        >
-                            <option value="all">Todas as Matérias</option>
-                            {stats.map(s => <option key={s.subject} value={s.subject}>{s.subject}</option>)}
-                        </select>
-                    </div>
-
-                    <div style={{ width: '100%', height: '220px' }}>
-                        <ResponsiveContainer width="99%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
-                                <Tooltip
-                                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#fff' }}
-                                />
-                                <Bar dataKey="val" radius={[4, 4, 0, 0]}>
-                                    {chartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={'var(--primary-500)'} />
+                <section className="relative" style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
+                    {!isPremium && <PremiumLock />}
+                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                        <div style={{ marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                                <div className="flex-row items-center gap-2">
+                                    <span className="material-symbols-outlined" style={{ color: 'var(--primary-500)' }}>show_chart</span>
+                                    <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-900)' }}>Evolução</h2>
+                                </div>
+                                {/* Period Filter */}
+                                <div style={{ display: 'flex', backgroundColor: 'var(--surface-100)', borderRadius: '8px', padding: '4px' }}>
+                                    {['weekly', 'monthly', 'all'].map((t) => (
+                                        <button
+                                            key={t}
+                                            onClick={() => { setTimeRange(t as any); }}
+                                            style={{
+                                                padding: '4px 12px', fontSize: '0.75rem', fontWeight: 700, borderRadius: '6px',
+                                                backgroundColor: timeRange === t ? 'var(--surface-0)' : 'transparent',
+                                                color: timeRange === t ? 'var(--primary-600)' : 'var(--text-500)',
+                                                boxShadow: timeRange === t ? 'var(--shadow-sm)' : 'none'
+                                            }}
+                                        >
+                                            {t === 'weekly' ? 'Sem' : t === 'monthly' ? 'Mês' : 'Geral'}
+                                        </button>
                                     ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                        {chartData.length === 0 && (
-                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-400)', fontSize: '0.875rem' }}>
-                                Sem dados.
+                                </div>
                             </div>
-                        )}
+                            {/* Subject Select */}
+                            <select
+                                value={selectedSubjectChart}
+                                onChange={(e) => { setSelectedSubjectChart(e.target.value); }}
+                                style={{
+                                    width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--surface-200)',
+                                    backgroundColor: 'var(--surface-50)', color: 'var(--text-700)', fontSize: '0.875rem', outline: 'none'
+                                }}
+                            >
+                                <option value="all">Todas as Matérias</option>
+                                {stats.map(s => <option key={s.subject} value={s.subject}>{s.subject}</option>)}
+                            </select>
+                        </div>
+                        <div style={{ width: '100%', height: '300px' }}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <XAxis
+                                        dataKey="name"
+                                        stroke="var(--text-500)"
+                                        fontSize={12}
+                                        tickLine={false}
+                                        axisLine={false}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--surface-0)', borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)' }}
+                                        cursor={{ fill: 'var(--surface-100)' }}
+                                    />
+                                    <Bar dataKey="val" radius={[4, 4, 0, 0]}>
+                                        {chartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.val >= 70 ? 'var(--success-main)' : entry.val >= 50 ? 'var(--warning)' : 'var(--error-main)'} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                            {chartData.length === 0 && (
+                                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-400)', fontSize: '0.875rem' }}>
+                                    Sem dados.
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </section>
             </main>

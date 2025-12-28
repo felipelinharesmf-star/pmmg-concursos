@@ -119,6 +119,24 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
           setBookmarkId(null);
         }
       } else {
+        // Add bookmark - Check limit first if Free
+        if (subscriptionPlan === 'free') {
+          const { count } = await supabase
+            .from('user_bookmarks')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id);
+
+          if ((count || 0) >= 5) {
+            // Revert optimistic update
+            setIsBookmarked(previousState);
+            // Trigger limit modal (reusing same modal state for now, logic below might need adjusting text)
+            setIsLimitReached(true);
+            // Note: Ideally we change the modal text, but for MVP reusing the 'Limit Reached' modal is acceptable 
+            // or we can add a specific state 'isBookmarkLimit'.
+            return;
+          }
+        }
+
         // Add bookmark
         const { data, error } = await supabase
           .from('user_bookmarks')
