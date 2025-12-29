@@ -120,25 +120,26 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
     <div className="flex flex-col min-h-full bg-background-light dark:bg-background-dark">
       {/* Header Sticky */}
       <div className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
-        <div className="flex items-center justify-between px-4 h-16">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between px-4 h-20">
+          <div className="flex items-center gap-4">
             <div
-              className="w-10 h-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-700"
+              className="w-14 h-14 rounded-full bg-cover bg-center border-2 border-primary-100 dark:border-gray-700 shadow-sm"
               style={{
                 backgroundImage: `url("${avatarUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAG1JRpW-MOblJm1eR4ShxoLKdJTJNQAE9jBTEyKk2oiN8skbt5HtYgjKTbiJLLOQOncaqQgOaDk_VYWE6rIhJB0Sr1XHzUWWhs5FEYubZhlUkgErlRqE38Mtxp8m9kwofDQJP4kU2YC7qwrP710QjOcRMNGteP3gNEfwr3VeaRqiM1AXeZuEnZwEz7gc661jaC_FIyP2TEju1-NPGCa4ejuA8gzVMbL4yqAD5t2s4yJGKZWGEhoTB6aBziyG7Zbk1_vMk7lwJ4HA'}")`
               }}
             />
-            <div className="flex flex-col justify-center">
-              <h1 className="text-sm font-bold text-gray-900 dark:text-white leading-none">{userName}</h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Concurso {targetExam}</span>
+            <div className="flex flex-col justify-center gap-0.5">
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-none">{userName}</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Concurso {targetExam}</span>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300">
-              <span className="material-symbols-outlined text-[20px]">notifications</span>
+            <button className="p-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300 relative group">
+              <span className="material-symbols-outlined text-[24px] group-active:scale-95 transition-transform">notifications</span>
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-red-500 border-2 border-background-light dark:border-background-dark rounded-full"></span>
             </button>
           </div>
         </div>

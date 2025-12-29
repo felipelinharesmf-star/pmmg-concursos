@@ -147,29 +147,19 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
     const isPremium = userProfile?.subscription_plan && ['monthly', 'quarterly', 'semiannual'].includes(userProfile.subscription_plan);
 
     const PremiumLock = () => (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 dark:bg-black/80 backdrop-blur-sm rounded-2xl overflow-hidden">
-            {/* Gradient Background Effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 to-purple-600/10 pointer-events-none" />
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/5 dark:bg-black/30 rounded-2xl overflow-hidden transition-all duration-300">
+            <div className="relative z-10 flex flex-col items-center p-1 text-center animate-in fade-in zoom-in-95 duration-500 delay-100">
+                <span className="material-symbols-outlined text-white text-xl mb-0.5 drop-shadow-md">lock</span>
 
-            <div className="relative z-10 flex flex-col items-center p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg mb-3 animate-[bounce_3s_infinite]">
-                    <span className="material-symbols-outlined text-white text-2xl">lock</span>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                <h3 className="text-[10px] font-black tracking-wide text-white mb-1.5 drop-shadow-md uppercase">
                     Conteúdo Premium
                 </h3>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 max-w-[200px] mb-4 leading-relaxed">
-                    Desbloqueie rankings, gráficos e análises detalhadas.
-                </p>
-
                 <button
                     onClick={() => onNavigate(Screen.SUBSCRIPTION)}
-                    className="px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm rounded-lg shadow-lg hover:scale-105 transition-transform active:scale-95 flex items-center gap-2"
+                    className="px-2.5 py-1 bg-white text-slate-900 font-bold text-[10px] leading-none rounded-lg shadow-md hover:scale-105 transition-transform active:scale-95 flex items-center gap-1"
                 >
-                    <span>Seja Premium</span>
-                    <span className="material-symbols-outlined text-lg">crown</span>
+                    <span>ASSINE AGORA</span>
                 </button>
             </div>
         </div>
@@ -278,7 +268,7 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
                 {/* 1. Privacy Section */}
                 <section className="relative" style={{ width: '100%', backgroundColor: 'var(--primary-50)', borderRadius: '16px', padding: '20px', border: '1px solid var(--primary-100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {!isPremium && <PremiumLock />}
-                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm w-full flex justify-between items-center' : 'w-full flex justify-between items-center'}>
+                    <div className={!isPremium ? 'opacity-90 pointer-events-none select-none filter blur-[0.5px] w-full flex justify-between items-center transition-all duration-500' : 'w-full flex justify-between items-center'}>
                         <div>
                             <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--primary-900)' }}>Ranking Público</h3>
                             <p style={{ fontSize: '0.75rem', marginTop: '4px', color: userProfile?.is_public ? 'var(--success-dark)' : 'var(--primary-700)' }}>
@@ -307,7 +297,7 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
                 {/* 2. Ranking Card */}
                 <section className="relative" style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
                     {!isPremium && <PremiumLock />}
-                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                    <div className={!isPremium ? 'opacity-80 pointer-events-none select-none blur-[0px] transition-all duration-500' : ''}>
                         <div className="flex-row items-center gap-2 mb-4">
                             <span className="material-symbols-outlined" style={{ color: '#eab308' }}>emoji_events</span>
                             <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-900)' }}>Ranking Geral</h2>
@@ -348,7 +338,7 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
                 <section className="relative flex-col gap-4">
                     {!isPremium && <PremiumLock />}
                     <h2 style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-900)' }}>Desempenho por Matéria</h2>
-                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                    <div className={!isPremium ? 'opacity-80 pointer-events-none select-none blur-[0px] transition-all duration-500' : ''}>
                         {loading && stats.length === 0 ? (
                             <div style={{ textAlign: 'center', color: 'var(--text-500)', padding: '20px' }}>Carregando...</div>
                         ) : stats.length === 0 ? (
@@ -382,7 +372,7 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
                 {/* 4. Evolution Chart */}
                 <section className="relative" style={{ width: '100%', backgroundColor: 'var(--surface-0)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--surface-200)' }}>
                     {!isPremium && <PremiumLock />}
-                    <div className={!isPremium ? 'opacity-20 pointer-events-none select-none filter blur-sm' : ''}>
+                    <div className={!isPremium ? 'opacity-80 pointer-events-none select-none blur-[0px] transition-all duration-500' : ''}>
                         <div style={{ marginBottom: '16px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                                 <div className="flex-row items-center gap-2">

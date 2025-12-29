@@ -381,15 +381,26 @@ const FilterScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
 
                 {/* Toggles */}
                 <div className="px-4 pt-4 mt-2 space-y-2">
-                    <label className="flex items-center justify-between py-3 cursor-pointer group">
-                        <span className="text-base font-medium text-gray-900 dark:text-white">Somente não respondidas</span>
+                    <label className="flex items-center justify-between py-3 cursor-pointer group" onClick={(e) => {
+                        if (!isPremium) {
+                            e.preventDefault();
+                            setShowPremiumModal(true);
+                        }
+                    }}>
+                        <div className="flex items-center gap-2">
+                            <span className="text-base font-medium text-gray-900 dark:text-white">Somente não respondidas</span>
+                            {!isPremium && <span className="material-symbols-outlined text-sm text-yellow-600" title="Premium">lock</span>}
+                        </div>
                         <input
                             type="checkbox"
                             className="sr-only peer"
                             checked={onlyNotAnswered}
-                            onChange={(e) => setOnlyNotAnswered(e.target.checked)}
+                            onChange={(e) => {
+                                if (isPremium) setOnlyNotAnswered(e.target.checked);
+                            }}
+                            disabled={!isPremium}
                         />
-                        <div className="relative w-11 h-6 bg-gray-300 dark:bg-[#3b4354] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                        <div className={`relative w-11 h-6 bg-gray-300 dark:bg-[#3b4354] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 ${isPremium ? 'peer-checked:bg-primary' : 'opacity-60 cursor-not-allowed'}`}></div>
                     </label>
                     <label className="flex items-center justify-between py-3 cursor-pointer group" onClick={(e) => {
                         if (!isPremium) {

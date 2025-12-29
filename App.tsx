@@ -8,7 +8,7 @@ import QuestionScreen from './screens/QuestionScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import PerformanceScreen from './screens/PerformanceScreen';
-import ReviewListScreen from './screens/ReviewListScreen';
+
 import SubscriptionScreen from './screens/SubscriptionScreen';
 import { supabase } from './lib/supabase';
 
@@ -72,7 +72,7 @@ const App: React.FC = () => {
           {currentScreen === Screen.QUESTION && <QuestionScreen onNavigate={handleNavigate} params={params} />}
           {currentScreen === Screen.SETTINGS && <SettingsScreen onNavigate={handleNavigate} />}
           {currentScreen === Screen.PERFORMANCE && <PerformanceScreen onNavigate={handleNavigate} />}
-          {currentScreen === Screen.REVIEW_LIST && <ReviewListScreen onNavigate={handleNavigate} params={params} />}
+
           {currentScreen === Screen.SUBSCRIPTION && <SubscriptionScreen onNavigate={handleNavigate} />}
         </Layout>
       )}

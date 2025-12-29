@@ -11,7 +11,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
   const [error, setError] = useState<string | null>(null);
 
   // State for limit enforcement
-  const [isLimitReached, setIsLimitReached] = useState(false);
+  const [limitModalType, setLimitModalType] = useState<null | 'daily_limit' | 'bookmark_limit'>(null);
   const [subscriptionPlan, setSubscriptionPlan] = useState('free');
   const [dailyCount, setDailyCount] = useState(0);
 
@@ -51,7 +51,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
         setDailyCount(countVal);
 
         if (countVal >= 10) {
-          setIsLimitReached(true);
+          setLimitModalType('daily_limit');
         }
       }
     } catch (err) {
@@ -129,10 +129,8 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
           if ((count || 0) >= 5) {
             // Revert optimistic update
             setIsBookmarked(previousState);
-            // Trigger limit modal (reusing same modal state for now, logic below might need adjusting text)
-            setIsLimitReached(true);
-            // Note: Ideally we change the modal text, but for MVP reusing the 'Limit Reached' modal is acceptable 
-            // or we can add a specific state 'isBookmarkLimit'.
+            // Trigger limit modal
+            setLimitModalType('bookmark_limit');
             return;
           }
         }
@@ -326,7 +324,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
     if (selectedOption) {
       // Re-verify limit before answering (security)
       if (subscriptionPlan === 'free' && dailyCount >= 10) {
-        setIsLimitReached(true);
+        setLimitModalType('daily_limit');
         return;
       }
 
@@ -382,7 +380,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
   };
 
   // Limit Modal
-  if (isLimitReached) {
+  if (limitModalType) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div className="bg-white dark:bg-surface-dark rounded-2xl w-full max-w-sm p-6 text-center space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
@@ -391,9 +389,14 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
           </div>
 
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Limite Diário Atingido</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              {limitModalType === 'daily_limit' ? 'Limite Diário Atingido' : 'Limite de Favoritos'}
+            </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
-              Você já respondeu 10 questões hoje. Ser <span className="font-bold text-primary-600">Premium</span> te dá acesso ilimitado!
+              {limitModalType === 'daily_limit'
+                ? <span>Você já respondeu 10 questões hoje. Ser <span className="font-bold text-primary-600">Premium</span> te dá acesso ilimitado!</span>
+                : <span>Você já salvou 5 questões. Ser <span className="font-bold text-primary-600">Premium</span> te dá favoritos ilimitados!</span>
+              }
             </p>
           </div>
 
@@ -405,10 +408,17 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
               Virar Premium Agora
             </button>
             <button
-              onClick={() => onNavigate(Screen.DASHBOARD)}
+              onClick={() => {
+                if (limitModalType === 'daily_limit') {
+                  onNavigate(Screen.DASHBOARD);
+                } else {
+                  // Just close if it's bookmark limit, so they can continue reviewing/answering this question
+                  setLimitModalType(null);
+                }
+              }}
               className="w-full py-3 text-gray-500 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
             >
-              Voltar ao Início
+              {limitModalType === 'daily_limit' ? 'Voltar ao Início' : 'Entendi'}
             </button>
           </div>
         </div>
@@ -478,20 +488,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
               )}
             </div>
           </div>
-          <button
-            onClick={toggleBookmark}
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full border transition-all ${isBookmarked ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-          >
-            <span
-              className={`material-symbols-outlined text-[20px] ${isBookmarked ? 'font-variation-fill' : ''}`}
-              style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}
-            >
-              bookmark
-            </span>
-            <span className="text-sm font-semibold">
-              {isBookmarked ? 'Salva para revisão' : 'Salvar para revisão'}
-            </span>
-          </button>
+          <div className="w-10"></div>
         </div>
 
         {/* Progress Bar inside Header */}
@@ -510,9 +507,26 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
 
           {/* Question Header/Context */}
           <div className="px-4 pt-6 pb-2">
-            <div className="question-tag" style={{ marginBottom: '12px' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>school</span>
-              <span>{currentQuestion.subject}</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="question-tag">
+                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>school</span>
+                <span>{currentQuestion.subject}</span>
+              </div>
+
+              <button
+                onClick={toggleBookmark}
+                className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border transition-all ${isBookmarked ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-transparent border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+              >
+                <span
+                  className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'font-variation-fill' : ''}`}
+                  style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}
+                >
+                  bookmark
+                </span>
+                <span className="text-xs font-semibold">
+                  {isBookmarked ? 'Salva para revisão' : 'Salvar para revisão'}
+                </span>
+              </button>
             </div>
 
             <div className="text-body text-gray-900 dark:text-gray-100 mb-4 font-medium leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>

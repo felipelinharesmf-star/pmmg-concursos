@@ -166,9 +166,9 @@ const SettingsScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
             onClick={() => fileInputRef.current?.click()}
           >
             <div
-              className="size-20 rounded-full bg-cover bg-center border-2 border-primary"
+              className="size-20 rounded-full bg-cover bg-center border-2 border-primary-100 dark:border-gray-700 shadow-sm"
               style={{
-                backgroundImage: `url("${profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBetRp082sicGUBTeDyr2A97lX36Duj98k65jsxmAKdtZwRS-5-dyVnEWLQUoHWTrIGCiM3umnXwlc4abC-y35wNX3ZQ3zt1Yyx6dj8Zl0D8BFugyTKceuJcXcDkobpGQug6ZU0JE_-Ncxb9aOYf5P4oQURxBHsr5kgfWQSVVp-jrWXQKOAXSQQFKge18ShtqF2PH1FK31-7U2sydpCSzCborMSetRiT6OfAJY_t-86mjHS_tpyZ3n5GxXU-t6vvFMfX8tF_hcRyQ'}")`,
+                backgroundImage: `url("${profile.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAG1JRpW-MOblJm1eR4ShxoLKdJTJNQAE9jBTEyKk2oiN8skbt5HtYgjKTbiJLLOQOncaqQgOaDk_VYWE6rIhJB0Sr1XHzUWWhs5FEYubZhlUkgErlRqE38Mtxp8m9kwofDQJP4kU2YC7qwrP710QjOcRMNGteP3gNEfwr3VeaRqiM1AXeZuEnZwEz7gc661jaC_FIyP2TEju1-NPGCa4ejuA8gzVMbL4yqAD5t2s4yJGKZWGEhoTB6aBziyG7Zbk1_vMk7lwJ4HA'}")`,
                 opacity: uploading ? 0.5 : 1
               }}
             ></div>
