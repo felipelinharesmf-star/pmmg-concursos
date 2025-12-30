@@ -151,9 +151,9 @@ button {
 /* Mobile App Container */
 .app-container {
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     /* Fixed height to force internal scrolling */
-    max-height: 100vh;
+    max-height: 100dvh;
     margin: 0 auto;
     background-color: #f0f2f5;
     /* Match screen background to avoid white bar */

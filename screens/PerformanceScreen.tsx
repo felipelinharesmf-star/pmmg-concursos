@@ -84,10 +84,18 @@ const PerformanceScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
             }
 
             if (answers) {
-                setAllAnswers(answers); // Store for local filtering
+                // Limit for Free Users: Only use first 10 answers for stats and charts
+                const isPremiumUser = profile?.subscription_plan && ['monthly', 'quarterly', 'semiannual'].includes(profile.subscription_plan);
+                let effectiveAnswers = answers;
+
+                if (!isPremiumUser) {
+                    effectiveAnswers = answers.slice(0, 10);
+                }
+
+                setAllAnswers(effectiveAnswers); // Store for local filtering (Evolution Chart)
 
                 const subjectMap = new Map<string, { correct: number; total: number }>();
-                answers.forEach((ans: any) => {
+                effectiveAnswers.forEach((ans: any) => {
                     const current = subjectMap.get(ans.subject) || { correct: 0, total: 0 };
                     subjectMap.set(ans.subject, {
                         correct: current.correct + (ans.is_correct ? 1 : 0),
