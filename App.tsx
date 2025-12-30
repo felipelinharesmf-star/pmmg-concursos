@@ -40,6 +40,26 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    // Check for payment return status
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const preference_id = params.get('preference_id');
+
+    if (status) {
+      if (status === 'success') {
+        alert('Pagamento realizado com sucesso! Sua assinatura será ativada em instantes.');
+      } else if (status === 'failure') {
+        alert('Houve um erro no pagamento. Tente novamente.');
+      } else if (status === 'pending') {
+        alert('Pagamento em processamento. Aguarde a confirmação.');
+      }
+
+      // Clear params from URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const handleNavigate = (screen: Screen, newParams?: any) => {
     setCurrentScreen(screen);
     setParams(newParams);

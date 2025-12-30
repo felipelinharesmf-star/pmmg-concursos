@@ -21,30 +21,29 @@ const SubscriptionScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
     const handleSubscribe = async (plan: 'monthly' | 'quarterly' | 'semiannual') => {
         setLoading(true);
         try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-
-            // MOCK PAYMENT PROCESS
-            // In a real app, integrate Stripe/RevenueCat here.
-
-            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate api call
-
-            const { error } = await supabase
-                .from('user_profiles')
-                .update({
-                    subscription_plan: plan,
-                    subscription_status: 'active',
-                    subscription_expires_at: new Date(Date.now() + (plan === 'monthly' ? 30 : plan === 'quarterly' ? 90 : 180) * 24 * 60 * 60 * 1000).toISOString()
-                })
-                .eq('id', user.id);
+            const { data, error } = await supabase.functions.invoke('create-checkout', {
+                body: {
+                    plan_type: plan,
+                    return_url: window.location.origin
+                }
+            });
 
             if (error) throw error;
 
-            alert('Assinatura realizada com sucesso! (Simulação)');
-            setCurrentPlan(plan);
-            onNavigate(Screen.SETTINGS); // Go back to settings to see the update
+            // In production/standard flow, we use the init_point (checkout_url) returned by MP
+            const paymentUrl = data.checkout_url;
+
+            if (data && paymentUrl) {
+                // Open Mercado Pago Checkout
+                window.open(paymentUrl, '_self');
+            } else {
+                throw new Error('Link de pagamento não gerado');
+            }
         } catch (error: any) {
-            alert('Erro ao assinar: ' + error.message);
+            console.error('Error creating checkout:', error);
+
+            // Simple user-friendly error message
+            alert('Não foi possível iniciar o pagamento. Por favor, tente novamente mais tarde.');
         } finally {
             setLoading(false);
         }
@@ -163,7 +162,7 @@ const SubscriptionScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
                     </div>
 
                     <p className="text-center text-xs text-gray-400">
-                        Cobrança recorrente. Cancele a qualquer momento nas configurações.
+                        Pagamento único. Acesso imediato via PIX ou Cartão. Sem renovação automática surpresa.
                     </p>
                 </div>
             </main>

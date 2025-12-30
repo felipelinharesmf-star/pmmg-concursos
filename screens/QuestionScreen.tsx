@@ -491,7 +491,30 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
           <div className="w-10"></div>
         </div>
 
-        {/* Progress Bar inside Header */}
+        {/* Sub-Header (Sticky) */}
+        <div className="px-4 py-2 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-4">
+          <div className="question-tag flex-shrink-0">
+            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>school</span>
+            <span className="truncate max-w-[150px]">{currentQuestion.subject}</span>
+          </div>
+
+          <button
+            onClick={toggleBookmark}
+            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border transition-all ${isBookmarked ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-transparent border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+          >
+            <span
+              className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'font-variation-fill' : ''}`}
+              style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}
+            >
+              bookmark
+            </span>
+            <span className="text-xs font-semibold whitespace-nowrap">
+              {isBookmarked ? 'Salva' : 'Salvar'}
+            </span>
+          </button>
+        </div>
+
+        {/* Progress Bar */}
         <div className="w-full h-1 bg-gray-200 dark:bg-gray-700">
           <div
             className="h-full bg-primary-500 transition-all duration-300 ease-out"
@@ -506,29 +529,8 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
 
 
           {/* Question Header/Context */}
+          {/* Question Text */}
           <div className="px-4 pt-6 pb-2">
-            <div className="flex items-center justify-between mb-3">
-              <div className="question-tag">
-                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>school</span>
-                <span>{currentQuestion.subject}</span>
-              </div>
-
-              <button
-                onClick={toggleBookmark}
-                className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-full border transition-all ${isBookmarked ? 'bg-primary-50 border-primary-200 text-primary-700' : 'bg-transparent border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-              >
-                <span
-                  className={`material-symbols-outlined text-[18px] ${isBookmarked ? 'font-variation-fill' : ''}`}
-                  style={{ fontVariationSettings: isBookmarked ? "'FILL' 1" : "'FILL' 0" }}
-                >
-                  bookmark
-                </span>
-                <span className="text-xs font-semibold">
-                  {isBookmarked ? 'Salva para revisão' : 'Salvar para revisão'}
-                </span>
-              </button>
-            </div>
-
             <div className="text-body text-gray-900 dark:text-gray-100 mb-4 font-medium leading-relaxed" style={{ whiteSpace: 'pre-wrap' }}>
               {currentQuestion.text.replace(/\\n/g, '\n')}
             </div>

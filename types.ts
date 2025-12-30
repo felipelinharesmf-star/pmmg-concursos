@@ -37,7 +37,10 @@ export interface UserProfile {
   display_name: string;
   is_public: boolean;
   subscription_plan?: 'free' | 'monthly' | 'quarterly' | 'semiannual';
-  subscription_status?: string;
+  subscription_status?: 'active' | 'pending' | 'cancelled' | 'paused' | 'expired';
+  subscription_id?: string;
+  customer_id?: string;
+  subscription_end_date?: string;
 }
 
 
