@@ -178,7 +178,8 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
         { id: 'D', text: q.AlternativaD || q.Alternativa_d || q.alternativaD || '' },
       ],
       correctOptionId: q.Gabarito || q.gabarito,
-      source: q.Fonte_documento || q.fonte_documento || ''
+      source: q.Fonte_documento || q.fonte_documento || '',
+      comment: q.comentario || q.Comentario // Map comment field
     }));
     setQuestions(mappedQuestions);
   };
@@ -187,7 +188,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
     setLoading(true);
     setError(null);
     try {
-      // Cast params to include onlyBookmarks and searchText
+      // Cast params to include onlyBookmarks and searchText and now arrays
       const filters = params as (FilterParams & { onlyBookmarks?: boolean, onlyWrong?: boolean, searchText?: string }) | undefined;
       console.log('Fetching with filters:', filters);
 
@@ -252,8 +253,8 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
       else {
         // Prepare RPC params
         const rpcParams = {
-          p_discipline: filters?.discipline || null,
-          p_source: filters?.source || null,
+          p_discipline: filters?.discipline || null, // Updated to pass array
+          p_source: filters?.source || null, // Updated to pass array
           p_exam: filters?.exam || null,
           p_search_text: filters?.searchText || null,
           p_limit: filters?.limit || 50,
@@ -568,6 +569,18 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
               }}>
                 {selectedOption === currentQuestion.correctOptionId ? 'Resposta Correta!' : `Incorreto! A resposta é a letra ${currentQuestion.correctOptionId}`}
               </div>
+
+              {currentQuestion.comment && (
+                <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  <h3 className="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[20px]">lightbulb</span>
+                    Comentário do Professor
+                  </h3>
+                  <p className="text-sm text-indigo-900 dark:text-indigo-100 leading-relaxed whitespace-pre-wrap">
+                    {currentQuestion.comment}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

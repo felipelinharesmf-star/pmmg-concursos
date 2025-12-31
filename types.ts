@@ -12,8 +12,8 @@ export enum Screen {
 }
 
 export interface FilterParams {
-  discipline?: string;
-  source?: string; // Was subject/board, now mapping specific source
+  discipline?: string[];
+  source?: string[]; // Was subject/board, now mapping specific source
   exam?: string; // Prova
   onlyWrong?: boolean; // New filter for reviewing errors
   onlyBookmarks?: boolean; // New filter for bookmarked questions
@@ -32,10 +32,23 @@ export interface Option {
   text: string;
 }
 
+export interface Notice {
+  id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  type: 'news' | 'exam' | 'promo' | 'update';
+  action_url?: string;
+  active: boolean;
+  priority: number;
+  created_at: string;
+}
+
 export interface UserProfile {
   id: string;
   display_name: string;
   is_public: boolean;
+  is_admin?: boolean;
   subscription_plan?: 'free' | 'monthly' | 'quarterly' | 'semiannual';
   subscription_status?: 'active' | 'pending' | 'cancelled' | 'paused' | 'expired';
   subscription_id?: string;
@@ -53,4 +66,5 @@ export interface Question {
   options: Option[];
   correctOptionId: string; // Gabarito
   source: string; // Fonte_documento
+  comment?: string; // Comentário/Explicação
 }

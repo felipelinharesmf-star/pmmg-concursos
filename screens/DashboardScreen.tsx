@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NavigationProps, Screen } from '../types';
+import { NavigationProps, Screen, Notice } from '../types';
 import { supabase } from '../lib/supabase';
 
 const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
@@ -10,6 +10,7 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [uploading, setUploading] = useState(false);
   const [percentile, setPercentile] = useState<number | null>(null);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string>('free');
+  const [notices, setNotices] = useState<Notice[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,6 +73,15 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
 
         const { data: percentileData, error: percentileError } = await supabase.rpc('get_user_percentile');
         if (!percentileError && percentileData !== null) setPercentile(percentileData);
+
+        // Fetch Notices
+        const { data: noticesData } = await supabase
+          .from('notices')
+          .select('*')
+          .eq('active', true)
+          .order('priority', { ascending: false });
+
+        if (noticesData) setNotices(noticesData);
       }
     };
     getUserData();
@@ -239,8 +249,66 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
           </button>
         </section>
 
+        {/* Notice Board */}
+        <NoticeBoard notices={notices} />
+
       </main>
     </div >
+  );
+};
+
+// Internal Notice Board Component
+const NoticeBoard: React.FC<{ notices: import('../types').Notice[] }> = ({ notices }) => {
+  if (!notices || notices.length === 0) return null;
+
+  return (
+    <section className="mt-2 mb-4">
+      <div className="flex items-center gap-2 mb-3 px-1">
+        <span className="material-symbols-outlined text-gray-500 dark:text-gray-400">campaign</span>
+        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Quadro de Avisos</h3>
+      </div>
+
+      <div className="flex overflow-x-auto gap-3 pb-4 -mx-4 px-4 scrollbar-hide snap-x">
+        {notices.map((notice) => (
+          <a
+            key={notice.id}
+            href={notice.action_url || '#'}
+            target={notice.action_url?.startsWith('http') ? '_blank' : '_self'}
+            className={`flex-shrink-0 w-72 snap-center rounded-2xl p-4 border relative overflow-hidden transition-all active:scale-95 ${notice.type === 'promo'
+              ? 'bg-gradient-to-br from-primary-600 to-indigo-700 border-transparent text-white shadow-lg shadow-primary/20'
+              : 'bg-surface-light dark:bg-surface-dark border-gray-200 dark:border-gray-800 shadow-sm'
+              }`}
+          >
+            <div className="flex items-start justify-between mb-2">
+              <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${notice.type === 'promo'
+                ? 'bg-white/20 text-white'
+                : notice.type === 'exam'
+                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                }`}>
+                {notice.type === 'news' ? 'Notícia' : notice.type === 'exam' ? 'Concurso' : notice.type === 'promo' ? 'Promoção' : 'Atualização'}
+              </span>
+              {notice.type === 'promo' && <span className="material-symbols-outlined text-white/50 text-[18px]">star</span>}
+            </div>
+
+            <h4 className={`font-bold text-sm mb-1 line-clamp-2 ${notice.type === 'promo' ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+              {notice.title}
+            </h4>
+
+            {notice.description && (
+              <p className={`text-xs line-clamp-2 ${notice.type === 'promo' ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>
+                {notice.description}
+              </p>
+            )}
+
+            <div className="mt-3 flex items-center gap-1 text-xs font-bold">
+              <span className={notice.type === 'promo' ? 'text-white' : 'text-primary'}>Saiba mais</span>
+              <span className={`material-symbols-outlined text-[14px] ${notice.type === 'promo' ? 'text-white' : 'text-primary'}`}>arrow_forward</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
   );
 };
 

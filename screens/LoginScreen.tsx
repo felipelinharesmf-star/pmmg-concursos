@@ -81,7 +81,7 @@ const LoginScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
           />
         </div>
         <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: 'var(--text-900)', lineHeight: 1.2, marginBottom: '8px' }}>
-          Concursos PMMG
+          Quadro de Acesso
         </h1>
         <p style={{ fontSize: '1rem', color: 'var(--text-500)' }}>
           Prepare-se para o sucesso. {authMode === 'login' ? 'Faça login' : 'Cadastre-se'} para continuar.
