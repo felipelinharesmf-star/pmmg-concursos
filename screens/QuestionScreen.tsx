@@ -50,7 +50,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
         const countVal = count || 0;
         setDailyCount(countVal);
 
-        if (countVal >= 10) {
+        if (countVal >= 5) {
           setLimitModalType('daily_limit');
         }
       }
@@ -324,7 +324,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
   const checkAnswer = async () => {
     if (selectedOption) {
       // Re-verify limit before answering (security)
-      if (subscriptionPlan === 'free' && dailyCount >= 10) {
+      if (subscriptionPlan === 'free' && dailyCount >= 5) {
         setLimitModalType('daily_limit');
         return;
       }
@@ -335,7 +335,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
       if (subscriptionPlan === 'free') {
         const newCount = dailyCount + 1;
         setDailyCount(newCount);
-        if (newCount >= 10) {
+        if (newCount >= 5) {
           // We allow this one answer, but warn for next? 
           // Usually better to warn AFTER this answer if they try next, OR show they used 10/10.
           // However, if newCount is 10, they just used their last one.
@@ -395,7 +395,7 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">
               {limitModalType === 'daily_limit'
-                ? <span>Você já respondeu 10 questões hoje. Ser <span className="font-bold text-primary-600">Premium</span> te dá acesso ilimitado!</span>
+                ? <span>Você já respondeu 5 questões hoje. Ser <span className="font-bold text-primary-600">Premium</span> te dá acesso ilimitado!</span>
                 : <span>Você já salvou 5 questões. Ser <span className="font-bold text-primary-600">Premium</span> te dá favoritos ilimitados!</span>
               }
             </p>
@@ -483,8 +483,8 @@ const QuestionScreen: React.FC<NavigationProps> = ({ onNavigate, params }) => {
             <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
               <span>Questão {currentIndex + 1} de {questions.length}</span>
               {subscriptionPlan === 'free' && (
-                <span className={`${dailyCount >= 8 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
-                  • {dailyCount}/10 hoje
+                <span className={`${dailyCount >= 4 ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
+                  • {dailyCount}/5 hoje
                 </span>
               )}
             </div>

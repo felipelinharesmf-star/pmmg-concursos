@@ -11,6 +11,7 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
   const [percentile, setPercentile] = useState<number | null>(null);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string>('free');
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [savedCount, setSavedCount] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +71,14 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
         }
 
 
+
+        // Fetch Saved Questions Count
+        const { count: bookmarksCount } = await supabase
+          .from('user_bookmarks')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+
+        setSavedCount(bookmarksCount || 0);
 
         const { data: percentileData, error: percentileError } = await supabase.rpc('get_user_percentile');
         if (!percentileError && percentileData !== null) setPercentile(percentileData);
@@ -240,12 +249,17 @@ const DashboardScreen: React.FC<NavigationProps> = ({ onNavigate }) => {
 
           <button
             onClick={() => onNavigate(Screen.FILTER, { context: 'bookmarks' })}
-            className="flex flex-col items-center justify-center gap-3 bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:border-orange-500/50 hover:bg-orange-500/5 transition-all group"
+            className="flex flex-col items-center justify-center gap-3 bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm hover:border-orange-500/50 hover:bg-orange-500/5 transition-all group relative"
           >
+            {savedCount !== null && savedCount > 0 && (
+              <span className="absolute top-3 right-3 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                {savedCount}
+              </span>
+            )}
             <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
               <span className="material-symbols-outlined text-[24px]">bookmark</span>
             </div>
-            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Questões para Revisão</span>
+            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Questões Salvas</span>
           </button>
         </section>
 
