@@ -102,6 +102,12 @@ serve(async (req) => {
         const testCPF = generateCPF(); // In production, ideally we'd ask the user for CPF. For now, we generate/dummy it or let MP handle if not required for strict checking.
 
         // Mercado Pago Preference Payload
+        // Determine max installments based on plan
+        let maxInstallments = 1;
+        if (plan_type === 'quarterly') maxInstallments = 3;
+        if (plan_type === 'semiannual') maxInstallments = 6;
+
+        // Mercado Pago Preference Payload
         const preferenceData = {
             // binary_mode: false, // Default is false (allow pending). Good for Pix.
             items: [
@@ -109,7 +115,7 @@ serve(async (req) => {
                     title: title,
                     quantity: 1,
                     currency_id: "BRL",
-                    unit_price: price,
+                    unit_price: Number(price.toFixed(2)),
                 },
             ],
             payer: {
@@ -124,7 +130,8 @@ serve(async (req) => {
             payment_methods: {
                 excluded_payment_types: [],
                 excluded_payment_methods: [],
-                installments: 12
+                installments: maxInstallments,
+                default_installments: maxInstallments
             },
             // payment_methods removed to allow ALL methods (Credit Card, Pix, Boleto)
             back_urls: {
